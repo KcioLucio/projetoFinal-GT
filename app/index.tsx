@@ -1,8 +1,28 @@
-import { Image, StyleSheet, View, Text, TextInput, Pressable, } from 'react-native';
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Image, StyleSheet, View, Text, TextInput, Pressable, Alert,} from 'react-native';
+import {useState, useEffect,} from 'react';
+import { useSafeAreaInsets } from  'react-native-safe-area-context'; /* Essa propriedade faz com que a tela se ajuste a area de notificação e barra de naveção do celular */
 
 export default function ListaDeCompras() {
   const insets = useSafeAreaInsets();
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+
+  function entrar(){
+
+    if(email.trim() ===''|| senha.trim() ===''){
+      Alert.alert('E-mail ou senha invalidos!');
+      return;
+    }
+    const emailValido = /\S+@\S+\.\S+/.test(email);
+    
+      if (!emailValido){
+        Alert.alert('Digite um e-mail válido!')
+        return;
+      }
+
+    Alert.alert('Login bem sucedido!');
+  }
+
   return (
 
     <View style={[styles.container,
@@ -16,7 +36,7 @@ export default function ListaDeCompras() {
         <Image
           source={require('../assets/carcomp.png')} 
           style={styles.logoTopo}
-          resizeMode='contain' 
+          resizeMode='contain' /* essa propriedade faz com que a imagem seja preenchida no espaço sem deforma-la */
         />
 
         <Text style={styles.nomeApp}>
@@ -45,6 +65,8 @@ export default function ListaDeCompras() {
             placeholderTextColor={'#888'}
             keyboardType='email-address'
             autoCapitalize='none'
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
 
@@ -58,6 +80,8 @@ export default function ListaDeCompras() {
             placeholder='Digite sua senha'
             placeholderTextColor={'#888'}
             secureTextEntry={true}
+            value={senha}
+            onChangeText={setSenha}
           />
         </View>
         
@@ -67,7 +91,7 @@ export default function ListaDeCompras() {
             </Text>
           </Pressable>
                
-          <Pressable onPress={() => console.log('Entrar')} style={styles.botao}>
+          <Pressable onPress={entrar} style={styles.botao}>
             <Text style={styles.textoBotao}>
               Entrar
             </Text>
@@ -107,9 +131,7 @@ const styles = StyleSheet.create({
   logoTopo:{
     width: 220, 
     height: 130, 
-    borderRadius:20,
-    boxShadow: '3px 4px 4px rgb(0,0,0, 0.30)',
-    
+    borderRadius:20,    
   },
   nomeApp:{
     fontSize: 24,
@@ -196,6 +218,6 @@ const styles = StyleSheet.create({
     color: '#0066cc',
     textAlign: 'center',
     textDecorationLine:'underline'
-  }
+  },
 /* aqui termina a estilização do footer. As estilizações do footer precisão estar antes dessa linha */
 });
