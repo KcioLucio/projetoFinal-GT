@@ -1,6 +1,7 @@
 import { Image, StyleSheet, View, Text, TextInput, Pressable, Alert,} from 'react-native';
 import {useState, useEffect,} from 'react';
 import { useSafeAreaInsets } from  'react-native-safe-area-context'; /* Essa propriedade faz com que a tela se ajuste a area de notificação e barra de naveção do celular */
+import {router} from 'expo-router';
 
 export default function ListaDeCompras() {
   const insets = useSafeAreaInsets();
@@ -20,7 +21,10 @@ export default function ListaDeCompras() {
         return;
       }
 
-    Alert.alert('Login bem sucedido!');
+    router.push('/lista');
+
+    setEmail('');
+    setSenha('');
   }
 
   return (
