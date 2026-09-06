@@ -1,8 +1,20 @@
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import {View, Text, StyleSheet, Pressable, Image, FlatList,} from 'react-native';
 import { useSafeAreaInsets } from  'react-native-safe-area-context';
+
+type ListaCompras={
+    id: string;
+    nome: string;
+    dataCriacao: string;
+    dataFinalizacao: string|null;
+    finalizado: boolean;
+};
+
 export default function Listas(){
     const insets = useSafeAreaInsets();
-    const temListas = false;
+    const listas: ListaCompras[] = [
+        
+];
+
     
     return(
 
@@ -30,23 +42,49 @@ export default function Listas(){
             </View>
 
             <View style={styles.listaConteudo}>
-                {temListas ?(
-                    <View>
+                <FlatList style={styles.cardsLista}
+                    data={listas}
+                    keyExtractor={(item ) => item.id}
+                    renderItem={({item}) => (
+                        <Pressable style={styles.card} onPress={() => console.log(item.nome)}>
+                            <Text style={styles.nomeLista}>
+                                {item.nome}
+                            </Text>
+                            <Text style={styles.dataLista}>
+                                Criado em: {item.dataCriacao}
+                            </Text>
+                            {
+                                item.finalizado ? (
+                                    <Text style={styles.statusFinalizado}>
+                                        Finalizado em: {item.dataFinalizacao}
+                                    </Text>
+                                ):(
+                                    <Text style={styles.statusAndamento}>
+                                        Em andamento
+                                    </Text>
+                                )
+                            }
+                        </Pressable>
+                    )}
 
-                    </View>
-                ):(
-                    <View style={styles.listaVazia}>
-                        <Text style={styles.tituloVazio}>
-                            Sem listas de compras hoje?
-                        </Text>
-                        <Text style={styles.textoVazio}>
-                            Crie uma nova lista para começar.
-                        </Text>
-                    </View>
-                )}
-            
+                    ListEmptyComponent={
+                        <View style={styles.listaVazia}>
+                            <Image 
+                                style={styles.carVazio}
+                                source={require('../assets/carvazio.png')}
+                                resizeMode='contain'
+                            />
+                            <Text style={styles.textoVazio}>
+                                Sem lista de compras hoje?
+                            </Text>
+
+                            <Text style={styles.textoVazio}>
+                                Crie uma nova lista para começar.
+                            </Text>                            
+                        </View>
+                    }
+                />            
             </View>
-
         </View>
     );
 }
@@ -105,11 +143,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        
+        paddingHorizontal: 20,        
     },
     listaVazia:{
-        alignItems: 'center'
+        alignItems: 'center',
+        paddingTop:40,
     },
     tituloVazio:{
         fontSize: 20,
@@ -120,5 +158,46 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#777'
     },
+    carVazio:{
+        width:360,
+        height:260,
+        marginBottom: 10,
+        
+    },
     /* aqui termina a estilização do Conteudo da Lista. As estilizações do Conteudo da lista precisão estar antes dessa linha */ 
+
+    /* aqui inicia a estilização dos Cards da Lista */
+    cardsLista:{
+        width: '100%'
+    },
+    card:{
+        backgroundColor: '#fff',
+        padding: 15,
+        marginBottom: 15,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#f0f0f0',
+        boxShadow: '3px 4px 4px rgba(0,0,0,0.20)',
+    },
+    nomeLista:{
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 8,
+    },
+    dataLista:{
+        fontSize: 13,
+        color: '#777',
+        marginBottom: 8,
+    },
+    statusAndamento:{
+        fontSize: 14,
+        color: 'green',
+        fontWeight: 'bold',
+    },
+    statusFinalizado:{
+        fontSize: 14,
+        color: '#777',
+        fontWeight: 'bold',
+    },
+    /* aqui termina a estilização dos Cards da Lista. As estilizações dos cards da lista precisão estar antes dessa linha */ 
 })
