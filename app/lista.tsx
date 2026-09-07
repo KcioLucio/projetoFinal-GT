@@ -1,4 +1,5 @@
-import {View, Text, StyleSheet, Pressable, Image, FlatList,} from 'react-native';
+import {View, Text, StyleSheet, Pressable, Image, FlatList, TextInput, Modal, Alert} from 'react-native';
+import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from  'react-native-safe-area-context';
 
 type ListaCompras={
@@ -11,10 +12,32 @@ type ListaCompras={
 
 export default function Listas(){
     const insets = useSafeAreaInsets();
-    const listas: ListaCompras[] = [
-        
-];
+    const [listas, setListas] = useState<ListaCompras[]>([]);
+    const [modalVisivel, setModalVisivel] = useState(false);
+    const [nomeNovaLista, setNomeNovaLista] = useState('');
 
+    function criarLista(){
+        if(nomeNovaLista.trim()===''){
+            Alert.alert(
+                'Atenção!',
+                'Digite um nome para a lista.'
+            );
+            return;
+        }
+
+        const novalista: ListaCompras = {
+            id: Date.now().toString(),
+            nome: nomeNovaLista.trim(),
+            dataCriacao: new Date().toLocaleDateString('pt-BR'),
+            dataFinalizacao: null,
+            finalizado: false,
+        };
+        setListas([
+            ...listas, novalista
+        ]);
+        setNomeNovaLista('');
+        setModalVisivel(false);
+    }
     
     return(
 
@@ -34,7 +57,7 @@ export default function Listas(){
             </View>
 
             <View style={styles.botao}>
-                <Pressable style={styles.botaoNovaLista} onPress={() => console.log('Lista adicionada!')}>
+                <Pressable style={styles.botaoNovaLista} onPress={() => setModalVisivel(true)}>
                     <Text style={styles.textoBotao}>
                         + Nova Lista
                     </Text>
@@ -85,6 +108,38 @@ export default function Listas(){
                     }
                 />            
             </View>
+
+            <Modal 
+                visible={modalVisivel}
+                transparent={true}
+                animationType='none'
+            >
+                <View style={styles.fundoModal}>
+                    <View style={styles.caixaModal}>
+                        <Text style={styles.tituloModal}>
+                            Nova Lista
+                        </Text>
+                        <TextInput
+                            style={styles.inputModal}
+                            placeholder='Nome da Lista'
+                            value={nomeNovaLista}
+                            onChangeText={setNomeNovaLista}
+                        />
+                        <View style={styles.botoesModal}>
+                            <Pressable style={styles.botaoCancelar} onPress={() => setModalVisivel(false)}>
+                                <Text>
+                                    Cancelar
+                                </Text>
+                            </Pressable>
+                            <Pressable style={styles.botaoCriar} onPress={criarLista}>
+                                <Text style={styles.textoCriar}>
+                                    Criar
+                                </Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -200,4 +255,56 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     /* aqui termina a estilização dos Cards da Lista. As estilizações dos cards da lista precisão estar antes dessa linha */ 
+
+     /* aqui inicia a estilização do Modal */
+    fundoModal:{
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 30,
+    },
+    caixaModal:{
+        width: '100%',
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+    },
+    tituloModal:{
+        fontSize: 22,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    inputModal:{
+        height: 45,
+        borderWidth: 1,
+        borderColor: '#aaa',
+        borderRadius: 6,
+        paddingHorizontal: 10,
+        marginBottom: 20,
+    },
+    botoesModal:{
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        gap: 10,
+    },
+    botaoCancelar:{
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        backgroundColor: '#ddd',
+        borderRadius: 6,
+    },
+    botaoCriar:{
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        backgroundColor: 'green',
+        borderRadius: 6,
+    },
+    textoCriar:{
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+     /* aqui termina a estilização dos Cards da Lista. As estilizações dos cards da lista precisão estar antes dessa linha */
+
 })
