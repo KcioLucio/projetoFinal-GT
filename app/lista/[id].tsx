@@ -1,7 +1,8 @@
-import {View, Text, StyleSheet, FlatList, Pressable, TextInput, Alert} from "react-native";
-import {useState} from 'react';
-import {useLocalSearchParams} from "expo-router";
-import {useSafeAreaInsets} from "react-native-safe-area-context";
+import {View, Text, StyleSheet, FlatList, Pressable, TextInput, Alert} from 'react-native';
+import {useState, useEffect} from 'react';
+import {useLocalSearchParams} from 'expo-router';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type ItemLista = {
     id: string;
@@ -14,9 +15,13 @@ type ItemLista = {
 export default function listaAtiva(){
 
     const insets = useSafeAreaInsets();
-    const {id, nome} = useLocalSearchParams();
-
+    const {id, nome} = useLocalSearchParams<{
+        id: string;
+        nome?: string;
+    }>();
+    const CHAVE_ITENS = `@lista_compras:itens:${id}`;
     const [itens, setItens] = useState<ItemLista[]>([]);
+    const [carregandoItens, setCarregandoItens] = useState(true);
     const [descricaoProduto, setDescricaoProduto] = useState('');
     const [quantidadeProduto, setQuantidadeProduto] = useState('');
 
@@ -80,6 +85,48 @@ export default function listaAtiva(){
         setItens(novosItens)
     }
 
+    useEffect(() => {
+        async function carregarItens() {
+
+            try {
+                const dadosSalvos = await AsyncStorage.getItem(CHAVE_ITENS);
+        
+                if (dadosSalvos !== null) {
+                    const itensSalvos: ItemLista[] = JSON.parse(dadosSalvos);
+                    setItens(itensSalvos);
+                }
+
+            } catch (erro) {
+                console.log(
+                    'Erro ao carregar itens:',
+                    erro
+                );
+            } finally {
+                setCarregandoItens(false);
+            }
+        }
+
+        carregarItens();
+    }, [id]);
+
+    useEffect(() => {
+        
+        if (carregandoItens) {
+            return;
+        }
+
+        async function salvarItens() {
+            try { await AsyncStorage.setItem(CHAVE_ITENS, JSON.stringify(itens));
+            } catch (erro) {
+                console.log(
+                   'Erro ao salvar itens:',
+                    erro
+                );
+            }
+        }
+        salvarItens();
+    }, [itens, carregandoItens]);
+
     return(
 
         <View
@@ -101,15 +148,15 @@ export default function listaAtiva(){
             <View style={styles.adicionarProduto}>
                 <TextInput
                     style={styles.inputProduto}
-                    placeholder="Digite o produto..."
+                    placeholder='Digite o produto...'
                     value={descricaoProduto}
                     onChangeText={setDescricaoProduto}
                 />
                 <View style={styles.adicionarQuantidade}>
                     <TextInput
                         style={styles.inputQuantidade}
-                        placeholder="Digite a Qtd"
-                        keyboardType="numeric"
+                        placeholder='Digite a Qtd'
+                        keyboardType='numeric'
                         value={quantidadeProduto}
                         onChangeText={setQuantidadeProduto}
                     />

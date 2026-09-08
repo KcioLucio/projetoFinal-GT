@@ -2,6 +2,8 @@ import {View, Text, StyleSheet, Pressable, Image, FlatList, TextInput, Modal, Al
 import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from  'react-native-safe-area-context';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import MenuInferior from '../components/menuInferior';
 
 type ListaCompras={
     id: string;
@@ -11,9 +13,12 @@ type ListaCompras={
     finalizado: boolean;
 };
 
+const CHAVE_LISTAS = '@lista_compras:listas';
+
 export default function Listas(){
     const insets = useSafeAreaInsets();
     const [listas, setListas] = useState<ListaCompras[]>([]);
+    const [carregando, setCarregando] = useState(true);
     const [modalVisivel, setModalVisivel] = useState(false);
     const [nomeNovaLista, setNomeNovaLista] = useState('');
 
@@ -38,15 +43,52 @@ export default function Listas(){
         ]);
         setNomeNovaLista('');
         setModalVisivel(false);
-        
     }
+    
+    useEffect(()=> {
+        async function carregarLista() {
+            try{
+                const dadosSalvos = await AsyncStorage.getItem(CHAVE_LISTAS);
+
+                if (dadosSalvos !== null) {
+                    const listasSalvas: ListaCompras[] = JSON.parse(dadosSalvos);
+                    setListas(listasSalvas);
+                }
+            } catch (erro){
+                console.log('Erro ao carregar listas:', erro);
+            } finally {
+                setCarregando(false);
+            }
+        }
+        carregarLista();
+    }, []);
+
+    useEffect(() => {
+
+        if (carregando) {
+            return;
+        }
+
+        async function salvarListas() {
+
+            try {await AsyncStorage.setItem(CHAVE_LISTAS, JSON.stringify(listas));
+            } catch (erro) {
+                console.log(
+                    'Erro ao salvar listas:',
+                    erro
+                );
+            }
+        }
+        salvarListas();
+    }, [listas, carregando]);
+
     
     return(
 
         <View style={[styles.container,
       {
       paddingTop: insets.top,
-      paddingBottom: insets.bottom,}
+      }
     ]}>
 
             <View style ={styles.listaTopo}>
@@ -117,7 +159,7 @@ export default function Listas(){
                     }
                 />            
             </View>
-
+            <MenuInferior />
             <Modal 
                 visible={modalVisivel}
                 transparent={true}
@@ -149,6 +191,7 @@ export default function Listas(){
                     </View>
                 </View>
             </Modal>
+            
         </View>
     );
 }

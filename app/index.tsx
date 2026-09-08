@@ -3,7 +3,7 @@ import {useState, useEffect,} from 'react';
 import { useSafeAreaInsets } from  'react-native-safe-area-context'; /* Essa propriedade faz com que a tela se ajuste a area de notificação e barra de naveção do celular */
 import {router} from 'expo-router';
 
-export default function ListaDeCompras() {
+export default function TelaLogin() {
   const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -21,7 +21,7 @@ export default function ListaDeCompras() {
         return;
       }
 
-    router.push('/lista');
+    router.replace('/lista');
 
     setEmail('');
     setSenha('');
@@ -153,14 +153,14 @@ const styles = StyleSheet.create({
   },
  titulo: {
     fontSize: 28,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: 'bold',
+    textAlign: 'center',
     marginBottom: 5,
   },
   subtitulo: {
     fontSize: 14,
-    color: "#666",
-    textAlign: "center",
+    color: '#666',
+    textAlign: 'center',
     marginBottom: 30,
   },  
   textoConteudo: {
