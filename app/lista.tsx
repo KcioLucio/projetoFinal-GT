@@ -1,6 +1,7 @@
 import {View, Text, StyleSheet, Pressable, Image, FlatList, TextInput, Modal, Alert} from 'react-native';
 import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from  'react-native-safe-area-context';
+import { router } from 'expo-router';
 
 type ListaCompras={
     id: string;
@@ -37,6 +38,7 @@ export default function Listas(){
         ]);
         setNomeNovaLista('');
         setModalVisivel(false);
+        
     }
     
     return(
@@ -49,7 +51,7 @@ export default function Listas(){
 
             <View style ={styles.listaTopo}>
                 <Text style={styles.titulo}>
-                    Minha Lista
+                    Minhas Listas
                 </Text>
                 <Text style={styles.subTitulo}>
                     Escolha uma lista ou crie uma nova.
@@ -69,7 +71,14 @@ export default function Listas(){
                     data={listas}
                     keyExtractor={(item ) => item.id}
                     renderItem={({item}) => (
-                        <Pressable style={styles.card} onPress={() => console.log(item.nome)}>
+                        <Pressable 
+                            style={styles.card} 
+                            onPress={() => 
+                                router.push({
+                                    pathname: '/lista/[id]',
+                                    params:{id: item.id, nome: item.nome},
+                                })
+                            }>
                             <Text style={styles.nomeLista}>
                                 {item.nome}
                             </Text>
